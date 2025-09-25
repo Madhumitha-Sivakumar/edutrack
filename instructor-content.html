@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduTrack – Instructor Content</title>
+  <style>
+    body {
+      background: #f6f8fa;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .form-container {
+      background: #fff;
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 2em;
+      border-radius: 12px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    }
+    .form-title {
+      text-align: center;
+      margin-bottom: 1em;
+      color: #2d3a4b;
+      font-size: 1.5em;
+      font-weight: 600;
+    }
+    label {
+      font-weight: 500;
+      color: #2d3a4b;
+    }
+    input[type="text"], input[type="number"] {
+      width: 100%;
+      padding: 0.7em;
+      margin: 0.5em 0 1em 0;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 1em;
+      box-sizing: border-box;
+    }
+    .question-block {
+      border: 1px solid #ccc;
+      padding: 1em;
+      margin-bottom: 1em;
+      border-radius: 8px;
+      background: #f9fafb;
+    }
+    .option-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.5em;
+    }
+    .option-item input[type="text"] {
+      flex: 1;
+      margin-right: 0.5em;
+    }
+    .remove-opt-btn, .add-opt-btn, .remove-q-btn {
+      background: #0074d9;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 0.4em 0.8em;
+      cursor: pointer;
+      font-size: 0.9em;
+      margin-top: 0.5em;
+      margin-right: 0.5em;
+    }
+    .remove-opt-btn {
+      background: #e74c3c;
+    }
+    .remove-q-btn {
+      background: #e74c3c;
+    }
+    .submit-btn {
+      width: 100%;
+      padding: 0.8em;
+      background: #2ecc40;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 1.1em;
+      font-weight: 500;
+      cursor: pointer;
+      margin-top: 1em;
+    }
+    .submit-btn:hover {
+      background: #27ae60;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <h2 class="form-title">Create Quiz</h2>
+    <label for="subject">Subject:</label>
+    <input type="text" id="subject" placeholder="Enter subject" required />
+
+    <label for="quizTime">Time (minutes):</label>
+    <input type="number" id="quizTime" placeholder="Enter time in minutes" min="1" required />
+
+    <div id="questionsContainer"></div>
+
+    <button id="addQuestionBtn" type="button" class="add-opt-btn">Add Question</button>
+    <button id="postQuizBtn" type="button" class="submit-btn">Post Quiz</button>
+  </div>
+
+  <script>
+    let questions = [];
+
+    function renderQuestions() {
+      const container = document.getElementById('questionsContainer');
+      container.innerHTML = '';
+      questions.forEach((q, qIdx) => {
+        const qDiv = document.createElement('div');
+        qDiv.className = 'question-block';
+
+        const qLabel = document.createElement('label');
+        qLabel.textContent = `Question ${qIdx + 1}:`;
+        qDiv.appendChild(qLabel);
+
+        const qInput = document.createElement('input');
+        qInput.type = 'text';
+        qInput.value = q.text;
+        qInput.placeholder = 'Enter question';
+        qInput.required = true;
+        qInput.oninput = (e) => {
+          questions[qIdx].text = e.target.value;
+        };
+        qDiv.appendChild(qInput);
+
+        q.options.forEach((opt, oIdx) => {
+          const optDiv = document.createElement('div');
+          optDiv.className = 'option-item';
+
+          const optInput = document.createElement('input');
+          optInput.type = 'text';
+          optInput.value = opt;
+          optInput.placeholder = `Option ${oIdx + 1}`;
+          optInput.required = true;
+          optInput.oninput = (e) => {
+            questions[qIdx].options[oIdx] = e.target.value;
+          };
+          optDiv.appendChild(optInput);
+
+          const radio = document.createElement('input');
+          radio.type = 'radio';
+          radio.name = `correct${qIdx}`;
+          radio.checked = q.correct === oIdx;
+          radio.onclick = () => {
+            questions[qIdx].correct = oIdx;
+          };
+          optDiv.appendChild(radio);
+
+          const markLabel = document.createElement('label');
+          markLabel.textContent = 'Mark correct';
+          optDiv.appendChild(markLabel);
+
+          const removeOptBtn = document.createElement('button');
+          removeOptBtn.type = 'button';
+          removeOptBtn.textContent = '❌';
+          removeOptBtn.className = 'remove-opt-btn';
+          removeOptBtn.onclick = () => {
+            questions[qIdx].options.splice(oIdx, 1);
+            if (questions[qIdx].correct === oIdx) {
+              questions[qIdx].correct = null;
+            } else if (questions[qIdx].correct > oIdx) {
+              questions[qIdx].correct--;
+            }
+            renderQuestions();
+          };
+          optDiv.appendChild(removeOptBtn);
+
+          qDiv.appendChild(optDiv);
+        });
+
+        const addOptBtn = document.createElement('button');
+        addOptBtn.type = 'button';
+        addOptBtn.textContent = 'Add Option';
+        addOptBtn.className = 'add-opt-btn';
+        addOptBtn.onclick = () => {
+          questions[qIdx].options.push('');
+          renderQuestions();
+        };
+        qDiv.appendChild(addOptBtn);
+
+        const removeQBtn = document.createElement('button');
+        removeQBtn.type = 'button';
+        removeQBtn.textContent = 'Remove Question';
+        removeQBtn.className = 'remove-q-btn';
+        removeQBtn.onclick = () => {
+          questions.splice(qIdx, 1);
+          renderQuestions();
+        };
+        qDiv.appendChild(removeQBtn);
+
+        container.appendChild(qDiv);
+      });
+    }
+
+    document.getElementById('addQuestionBtn').onclick = () => {
+      questions.push({ text: '', options: [''], correct: null });
+      renderQuestions();
+    };
+
+    document.getElementById('postQuizBtn').onclick = () => {
+      const subject = document.getElementById('subject').value.trim();
+      const quizTime = document.getElementById('quizTime').value.trim();
+
+      if (!subject || !quizTime || isNaN(quizTime) || Number(quizTime) < 1) {
+        alert('Please enter valid subject and time.');
+        return;
+      }
+
+      if (questions.length === 0) {
+        alert('Please add at least one question.');
+        return;
+      }
+
+      for (const q of questions) {
+        if (!q.text.trim()) {
+          alert('Please fill all question texts.');
+          return;
+        }
+        if (q.options.length < 2) {
+          alert('Each question must have at least 2 options.');
+          return;
+        }
+        for (const opt of q.options) {
+          if (!opt.trim()) {
+            alert('Please fill all option texts.');
+            return;
+          }
+        }
+        if (q.correct === null || q.correct === undefined) {
+          alert('Please mark the correct answer for each question.');
+          return;
+        }
+      }
+
+      const quizData = {
+        subject,
+        time: Number(quizTime),
+        questions
+      };
+
+      localStorage.setItem('latestQuiz', JSON.stringify(quizData));
+      alert('🎉 Quiz posted successfully!');
+
+      const link = document.createElement('a');
+      link.href = 'attend-quiz.html';
+      link.textContent = '👉 Click here to view the quiz';
+      link.style.display = 'block';
+      link.style.marginTop = '1em';
+      link.style.textAlign = 'center';
+      link.style.fontWeight = 'bold';
+      link.style.color = '#0074d9';
+
+      document.querySelector('.form-container').appendChild(link);
+    };
+
+    questions.push({ text: '', options: [''], correct: null });
+    renderQuestions();
+  </script>
+</body>
+</html>
+``

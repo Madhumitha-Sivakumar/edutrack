@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduTrack – Instructor Register</title>
+  <style>
+    body {
+      background: #f6f8fa;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .form-container {
+      background: #fff;
+      max-width: 400px;
+      margin: 40px auto;
+      padding: 2em 2.5em 2em 2.5em;
+      border-radius: 12px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    }
+    .form-title {
+      text-align: center;
+      margin-bottom: 1.5em;
+      color: #2d3a4b;
+      font-size: 1.5em;
+      font-weight: 600;
+    }
+    form input, form select {
+      width: 100%;
+      padding: 0.7em;
+      margin: 0.5em 0 1em 0;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 1em;
+      box-sizing: border-box;
+      transition: border 0.2s;
+    }
+    form input:focus, form select:focus {
+      border: 1.5px solid #0074d9;
+      outline: none;
+    }
+    .phone-group {
+      display: flex;
+      gap: 0.5em;
+      align-items: center;
+    }
+    .phone-group select {
+      width: 35%;
+      min-width: 80px;
+      padding: 0.7em 0.5em;
+    }
+    .phone-group input {
+      width: 65%;
+    }
+    .submit-btn {
+      width: 100%;
+      padding: 0.8em;
+      background: #0074d9;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 1.1em;
+      font-weight: 500;
+      cursor: pointer;
+      margin-top: 0.5em;
+      transition: background 0.2s;
+    }
+    .submit-btn:hover {
+      background: #005fa3;
+    }
+    .feedback {
+      color: #e74c3c;
+      font-size: 0.95em;
+      margin-bottom: 0.5em;
+      display: block;
+      min-height: 1.2em;
+    }
+    .success {
+      color: #27ae60;
+      font-size: 1em;
+      display: block;
+      margin-top: 0.7em;
+      min-height: 1.2em;
+      text-align: center;
+    }
+    .login-link {
+      text-align: center;
+      margin-top: 1.5em;
+      font-size: 1em;
+    }
+    .login-link a {
+      color: #0074d9;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .login-link a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <h2 class="form-title">Instructor Registration</h2>
+    <form id="instructorRegisterForm">
+      <input type="text" id="username" placeholder="Username" required />
+      <span id="usernameMsg" class="feedback"></span>
+
+      <div class="phone-group">
+        <select id="countryCode">
+          <option value="+91">🇮🇳 +91</option>
+          <option value="+1">🇺🇸 +1</option>
+          <option value="+44">🇬🇧 +44</option>
+        </select>
+        <input
+          type="text"
+          id="mobile"
+          placeholder="Mobile Number"
+          required
+          maxlength="10"
+          pattern="\d{10}"
+        />
+      </div>
+
+      <input type="email" id="email" placeholder="Email (e.g. user@example.com)" required />
+      <input type="password" id="password" placeholder="Password" required />
+      <span id="passwordMsg" class="feedback"></span>
+
+      <input type="text" id="designation" placeholder="Designation (e.g. Professor)" required />
+
+      <button type="submit" class="submit-btn">Register</button>
+      <span id="successMsg" class="success"></span>
+    </form>
+
+    <p class="login-link">
+      Already a user? <a href="instructor-login.html">Login here</a>
+    </p>
+  </div>
+
+  <script>
+    document.getElementById('instructorRegisterForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const username = document.getElementById('username').value.trim();
+      const mobile = document.getElementById('mobile').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const designation = document.getElementById('designation').value.trim();
+      const usernameMsg = document.getElementById('usernameMsg');
+      const passwordMsg = document.getElementById('passwordMsg');
+      const successMsg = document.getElementById('successMsg');
+
+      // Clear previous messages
+      usernameMsg.textContent = '';
+      passwordMsg.textContent = '';
+      successMsg.textContent = '';
+
+      // Mobile number validation
+      const mobileRegex = /^\d{10}$/;
+      if (!mobileRegex.test(mobile)) {
+        alert('📱 Mobile number must be exactly 10 digits.');
+        return;
+      }
+
+      // Email validation
+      const emailRegex = /^[^@]+@[^@]+\.[cC][oO][mM]$/;
+      if (!emailRegex.test(email)) {
+        alert('📧 Email must contain "@" and end with ".com"');
+        return;
+      }
+
+      // Password validation
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{6,}$/;
+      if (!passwordRegex.test(password)) {
+        passwordMsg.textContent = 'Password must include uppercase, lowercase, number, and special character.';
+        return;
+      }
+
+      // Simulate registration success
+      successMsg.textContent = '🎉 Registration successful! (Static demo only)';
+      setTimeout(() => {
+        window.location.href = 'instructor-content.html';
+      }, 1500);
+    });
+  </script>
+</body>
+</html>
